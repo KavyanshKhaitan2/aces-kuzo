@@ -1,46 +1,50 @@
 import pyglet
 from pyglet.window import mouse
+from .title_screen import TitleScreen
 
 window = pyglet.window.Window()
-label = pyglet.text.Label(
-    "Hello, world!",
-    font_size=36,
-    x=window.width // 2,
-    y=window.height // 2,
-    anchor_x="center",
-    anchor_y="center",
-)
 
-image = pyglet.resource.image("image.png")
+bg_color = (224, 230, 237)
 
-current_module = None
+pyglet.gl.glClearColor(bg_color[0] / 255, bg_color[1] / 255, bg_color[2] / 255, 1.0)
 
-circle_positions = [
-    
-]
+fps_display = pyglet.window.FPSDisplay(window=window, samples=1)
+fps_display.label.font_size = 16
+fps_display.label.anchor_y = "top"
+
+current_screen = None
+
+
+def set_current_screen(screen):
+    global current_screen
+    if current_screen:
+        current_screen.deinit()
+    current_screen = screen
+
 
 @window.event
 def on_draw():
     window.clear()
-    current_module.draw(window)
-    label.draw()
-    image.blit(0, 0)
-    for x, y in circle_positions:
-        pyglet.shapes.Circle(x, y, 5).draw()
+    current_screen.draw()
+    fps_display.draw()
+
 
 @window.event
 def on_key_press(symbol, modifiers):
-    print(f'A key was pressed {symbol=}, {modifiers=}')
+    print(f"A key was pressed {symbol=}, {modifiers=}")
+
 
 @window.event
 def on_mouse_press(x, y, button, modifiers):
-    if button == mouse.LEFT:
-        print('The left mouse button was pressed.')
-    if button == mouse.RIGHT:
-        print('The right mouse button was pressed.')
-    circle_positions.append((x, y))
+    current_screen.mouse_press(x, y, button, modifiers)
+
+
+@window.event
+def on_resize(w, h):
+    fps_display.label.y = window.height - 10
+    current_screen.resize(w, h)
+
 
 def main():
-    global current_module
-    from . import title_screen as current_module
+    set_current_screen(TitleScreen(set_current_screen, window=window))
     pyglet.app.run()
