@@ -1,12 +1,11 @@
 import pyglet
-from PIL import Image
-from io import BytesIO
 from .screen import Screen
 
 play_button_image = pyglet.resource.image("assets/play_button.png")
 
 up_button_image = pyglet.resource.image("assets/up_button.png")
 down_button_image = pyglet.resource.image("assets/down_button.png")
+tick_button_image = pyglet.resource.image("assets/tick_button.png")
 
 
 class TitleScreen(Screen):
@@ -32,7 +31,6 @@ class TitleScreen(Screen):
         )
 
     def play_button_pressed(self, widget):
-        print("[DEBUG] Starting game...")
         self.set_current_screen(
             PlayerCountSelectScreen(self.set_current_screen, window=self.window)
         )
@@ -93,10 +91,21 @@ class PlayerCountSelectScreen(Screen):
             batch=self.batch,
         )
         self.window.push_handlers(self.up_button)
-        self.window.clear
         self.up_button.set_handler("on_press", self.player_count_up)
-        self.state = "player_count_select"
         self.player_count_up(self.up_button)
+        
+        self.done_button = pyglet.gui.PushButton(
+            x=0,
+            y=0,
+            unpressed=tick_button_image,
+            pressed=tick_button_image,
+            batch=self.batch,
+        )
+        self.window.push_handlers(self.done_button)
+        self.done_button.set_handler("on_press", self.start_game)
+    
+    def start_game(self, widget):
+        print("STARTING GAME...")
 
     def player_count_down(self, widget):
         self.player_count -= 1 if self.player_count > 2 else 0

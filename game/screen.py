@@ -8,6 +8,9 @@ class Screen:
         self.init()
         self.resize(window.width, window.height)
 
+    def draw(self):
+        self.batch.draw()
+    
     def init(self):
         ...
     
