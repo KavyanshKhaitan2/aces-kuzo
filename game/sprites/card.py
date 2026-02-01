@@ -22,12 +22,12 @@ class CardSprite:
     def __init__(self, master, card:tuple[Literal['club', 'diamond', 'heart', 'spade'], Literal[1,2,3,4,5,6,7,8,9,10,11,12,13]], x, y, scaling=1):
         self.master = master
         self.card = card
-        self.filepath = f'assets/boardgamepack/PNG/Cards/card{card[0].title()}s{CARD_NAMES[card[1]]}.png'
         self.scaling = scaling
-        self.image = pygame.image.load(self.filepath)
-        self.image = pygame.transform.smoothscale(self.image, [x*scaling for x in self.image.get_size()])
+        self.showing = self.current_showing = True
         self.x, self.y = x, y
-    
+        
+        self.load_image(build_filepath=True)
+        
     def draw(self, events, x=None, y=None, scaling=None):
         self.x = self.x if x is None else x
         self.y = self.y if y is None else y
@@ -36,8 +36,12 @@ class CardSprite:
         
         if scaling != self.scaling:
             self.scaling = scaling
-            self.image = pygame.image.load(self.filepath)
-            self.image = pygame.transform.smoothscale(self.image, [x*scaling for x in self.image.get_size()])
+            self.load_image(build_filepath=False)
+        
+        if self.showing != self.current_showing:
+            print('toggle!')
+            self.load_image(build_filepath=True)
+            self.current_showing = self.showing
         
         self.master.display.blit(self.image, (self.x, self.y))
 
@@ -46,6 +50,7 @@ class CardSprite:
                 if self.colliding(pygame.mouse.get_pos()):
                     assets.SOUND_CARD_CLICKED.play()
                     print(f"card {self.card[0]}{self.card[1]}: click!")
+                    self.showing = not self.showing
     
     def colliding(self, x, y=None):
         if y is None:
@@ -53,6 +58,17 @@ class CardSprite:
         x = x - self.x
         y = y - self.y
         return self.image.get_rect().collidepoint(x, y)
+    
+    def load_image(self, build_filepath=False):
+        if build_filepath:
+            if self.showing:
+                self.filepath = f'assets/boardgamepack/PNG/Cards/card{self.card[0].title()}s{CARD_NAMES[self.card[1]]}.png'
+            else:
+                self.filepath = "assets/boardgamepack/PNG/Cards/cardBack_green1.png"
+            print(self.filepath, self.showing)
+        self.image = pygame.image.load(self.filepath)
+        self.image = pygame.transform.smoothscale(self.image, [x*self.scaling for x in self.image.get_size()])
+
     
     @property
     def width(self):

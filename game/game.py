@@ -1,6 +1,7 @@
 import pygame
 import random
 from .sprites.card import CardSprite
+from .sprites.card_deck import CardDeck
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -30,8 +31,9 @@ class GameScreen:
                 x=50,
                 y=50,
                 scaling=1,
-            )
+            ) for _ in range(6)
         ]
+        self.card_deck = CardDeck(self, self.cards)
 
     def on_event(self, event):
         if event.type == pygame.VIDEORESIZE:
@@ -47,24 +49,7 @@ class GameScreen:
 
         self.display.fill("#3F7CB6")
 
-        rect_width, rect_height = ((self.cards[0].width + 10) * 3) + 10, ((self.cards[0].height + 10) * 2) + 10
-        rect_x = self.screen_width - rect_width - 10
-        rect_y = self.screen_height - rect_height - 10
-        pygame.draw.rect(
-            self.display,
-            "#33618F",
-            pygame.rect.Rect(
-                rect_x,
-                rect_y,
-                rect_width,
-                rect_height
-            ),
-            0,
-            10,
-        )
-
-        for card in self.cards:
-            card.draw(events)
+        self.card_deck.draw(events)
 
     def on_cleanup(self):
         pygame.quit()
