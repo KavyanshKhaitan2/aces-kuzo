@@ -11,9 +11,9 @@ class App:
     def __init__(self):
         self._running = True
         self.display = None
-        self.size = self.screen_width, self.screen_height = 960, 600
+        self.size = self.screen_width, self.screen_height = 1200, 900
         self.init()
-        self.screen = GameScreen(self)
+        self.screen = GameScreen(self, ['Player 1', 'Player 2', 'Player 3', 'Player 4'])
 
     def init(self):
         pygame.init()
@@ -24,19 +24,6 @@ class App:
             pygame.display.toggle_fullscreen()
         self.clock = pygame.time.Clock()
         # pygame.time.set_timer(events.SCREEN_RESIZE_EVENT, 500)
-
-        self.cards = [
-            CardSprite(
-                self,
-                (
-                    random.choice(["club", "diamond", "heart", "spade"]),
-                    random.randint(1, 13),
-                ),
-                x=50,
-                y=50,
-                scaling=1
-            )
-        ]
         
         self.fps_font = pygame.font.SysFont(pygame.font.get_default_font(), 24)
         
@@ -52,12 +39,12 @@ class App:
             print(f"Window Resized! {self.size}")
 
     def on_loop(self):
-        self.clock.tick(30)
+        self.clock.tick(999)
 
     def on_render(self):
         fps = int(self.clock.get_fps())
         # fps = self.clock.get_fps()
-        self.display.blit(self.fps_font.render(f"FPS: {fps}", 1, "#000000"), (5, 5))
+        self.display.blit(self.fps_font.render(f"{fps}", 1, "#000000"), (5, 5))
 
 
     def on_cleanup(self):
@@ -73,7 +60,6 @@ class App:
             self.screen.loop(events)
             self.on_render()
             pygame.display.flip()
-            pygame.display.update()
             self.on_loop()
 
         self.on_cleanup()
